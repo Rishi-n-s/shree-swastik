@@ -47,7 +47,7 @@
       <h2 class="site-intro__title">Shree Swastik Enterprise</h2>
       <p class="site-intro__sub">Dr. Ambedkar Garden, Veraval</p>
     </div>
-    <button class="site-intro__skip" id="siteIntroSkip" type="button" aria-label="Skip intro and enter portal">
+    <button class="site-intro__skip" id="siteIntroSkip" type="button" aria-label="Skip intro and enter portal" onclick="document.body.classList.remove('intro-playing');document.documentElement.classList.add('intro-seen');document.getElementById('siteIntro')?.remove()">
       <span>Enter Portal</span>
       <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
     </button>
