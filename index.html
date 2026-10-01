@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shree Swastik Enterprise  Dr. Ambedkar Garden Veraval | Staff Recruitment 2026</title>
+  <meta name="description" content="Shree Swastik Enterprise Group. Official staff recruitment & civic management for Dr. Ambedkar Garden, Veraval. Office Role (CCTV & Security) and General Role (Operations & Ticketing).">
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Google Fonts: Outfit (Display), Inter (Body), Noto Sans Gujarati -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6.5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="intro.css">
+
+  <!-- Instant zero-flash check for returning visitors -->
+  <script>
+    try {
+      if (localStorage.getItem('swastik_intro_seen_v1') === 'true') {
+        document.documentElement.classList.add('intro-seen');
+      }
+    } catch (e) {}
+  </script>
+</head>
+<body class="theme-dark">
+  <!-- FIRST-VISIT CINEMATIC INTRO -->
+  <section class="site-intro" id="siteIntro" aria-label="Welcome to Shree Swastik Enterprise">
+    <video class="site-intro__video" id="siteIntroVideo" autoplay muted playsinline preload="auto" poster="poster.jpg">
+      <source src="swastik.mp4" type="video/mp4">
+    </video>
+    <div class="site-intro__shade" aria-hidden="true"></div>
+    <div class="site-intro__content">
+      <img src="logo.png" alt="Shree Swastik Enterprise" class="site-intro__logo">
+      <span class="site-intro__badge">OFFICIAL RECRUITMENT 2026</span>
+      <h2 class="site-intro__title">Shree Swastik Enterprise</h2>
+      <p class="site-intro__sub">Dr. Ambedkar Garden, Veraval</p>
+    </div>
+    <button class="site-intro__skip" id="siteIntroSkip" type="button" aria-label="Skip intro and enter portal">
+      <span>Enter Portal</span>
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </button>
+  </section>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="custom-cursor" id="customCursor"></div>
+  <div class="custom-cursor-dot" id="customCursorDot"></div>
+
+  <!-- FLOATING QUICK ACTIONS DOCK (Desktop) -->
+  <aside class="floating-quick-dock no-print" aria-label="Quick Actions">
+    <button class="dock-btn dock-lang" id="langToggleBtn" title="Switch Language / ભાષા બદલો" aria-label="Toggle language">
+      <i class="fa-solid fa-globe"></i>
+      <span id="currentLangLabel">ગુજરાતી</span>
+    </button>
+    <button class="dock-btn" onclick="switchToApplyTab()" title="Open Application Form">
+      <i class="fa-solid fa-file-pen"></i>
+      <span data-i18n="dockApply">Apply</span>
+    </button>
+    <button class="dock-btn" onclick="switchToFlyerTab()" title="Recruitment Flyer">
+      <i class="fa-solid fa-bullhorn"></i>
+      <span data-i18n="dockFlyer">Flyer</span>
+    </button>
+    <button class="dock-btn dock-print" onclick="window.print()" title="Print A4 Form">
+      <i class="fa-solid fa-print"></i>
+      <span data-i18n="dockPrint">A4 Doc</span>
+    </button>
+  </aside>
+
+  <!-- MASTER TOP HEADER -->
+  <header class="site-header no-print">
+    <div class="header-inner">
+      <!-- BRAND IDENTITY -->
+      <a href="#hero" class="brand-unit" aria-label="Shree Swastik Enterprise Home">
+        <div class="brand-emblem-wrap">
+          <img src="logo.png" alt="Shree Swastik Enterprise Logo" class="brand-logo-img">
+        </div>
+        <div class="brand-meta">
+          <span class="brand-title" data-i18n="brandMainTitle">SHREE SWASTIK ENTERPRISE</span>
+        </div>
+      </a>
+
+      <!-- DESKTOP NAVIGATION -->
+      <nav class="nav-control-hub" aria-label="Primary Navigation">
+        <!-- Interactive SVG Outline Animated Navigation (Uiverse Design) -->
+        <div class="uiverse-nav" role="tablist" aria-label="Main Navigation">
+          <div class="uiverse-nav-inner">
+            <button class="uiverse-btn nav-tab active" id="tabApplyBtn" data-target="apply-form-tab" role="tab" aria-selected="true">
+              <i class="fa-solid fa-file-signature"></i>
+              <span data-i18n="tabApply">Application Portal</span>
+            </button>
+            <button class="uiverse-btn nav-tab" id="tabFlyerBtn" data-target="flyer-view-tab" role="tab" aria-selected="false">
+              <i class="fa-solid fa-newspaper"></i>
+              <span data-i18n="tabFlyer">Recruitment Notice</span>
+            </button>
+            <button class="uiverse-btn nav-tab" id="tabPrintBtn" data-target="a4-print-tab" role="tab" aria-selected="false">
+              <i class="fa-solid fa-file-invoice"></i>
+              <span data-i18n="tabPrint">Official A4 Sheet</span>
+            </button>
+            
+
+            <!-- Animated SVG Laser Outline -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 540 48"
+              height="48"
+              width="540"
+              overflow="visible"
+              class="uiverse-outline"
+            >
+              <rect
+                stroke-width="3"
+                rx="24"
+                ry="24"
+                fill="transparent"
+                height="48"
+                width="540"
+                y="0"
+                x="0"
+                pathLength="100"
+                class="uiverse-rect"
+              ></rect>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Language Pill Switcher -->
+        <div class="lang-slidebar" id="langSlidebar" role="button" tabindex="0" title="Switch Language between English and Gujarati" aria-label="Switch Language">
+          <span class="lang-slidebar__pill" id="langSlidePill"></span>
+          <span class="lang-slidebar__opt" id="langOptGu">ગુજરાતી</span>
+          <span class="lang-slidebar__opt active" id="langOptEn">English</span>
+        </div>
+
+        <!-- Primary CTA in Nav -->
+        <button class="nav-cta-btn" onclick="switchToApplyTab()">
+          <span data-i18n="navCta">Apply Now</span>
+          <i class="fa-solid fa-arrow-right-long"></i>
+        </button>
+      </nav>
+
+      <!-- MOBILE MENU TOGGLE BUTTON -->
+      <button class="mobile-menu-toggle no-print" id="mobileMenuToggle" aria-label="Toggle Navigation Menu" aria-expanded="false">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+
+    <!-- MOBILE NAVIGATION DRAWER -->
+    <div class="mobile-nav-drawer no-print" id="mobileNavDrawer" aria-hidden="true">
+      <div class="mobile-nav-content">
+        <div class="mobile-nav-links">
+          <button class="mobile-nav-link nav-tab active" data-target="apply-form-tab" onclick="closeMobileMenu()">
+            <i class="fa-solid fa-file-signature"></i>
+            <span data-i18n="tabApply">Application Portal</span>
+          </button>
+          <button class="mobile-nav-link nav-tab" data-target="flyer-view-tab" onclick="closeMobileMenu()">
+            <i class="fa-solid fa-newspaper"></i>
+            <span data-i18n="tabFlyer">Recruitment Notice</span>
+          </button>
+          <button class="mobile-nav-link nav-tab" data-target="a4-print-tab" onclick="closeMobileMenu()">
+            <i class="fa-solid fa-file-invoice"></i>
+            <span data-i18n="tabPrint">Official A4 Sheet</span>
+          </button>
+          <a href="#overview" class="mobile-nav-link" onclick="closeMobileMenu()">
+            <i class="fa-solid fa-building"></i>
+            <span data-i18n="sec01Category">Enterprise Overview</span>
+          </a>
+          <a href="#values" class="mobile-nav-link" onclick="closeMobileMenu()">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span data-i18n="sec04Category">Operational Pillars</span>
+          </a>
+          <a href="#contact" class="mobile-nav-link" onclick="closeMobileMenu()">
+            <i class="fa-solid fa-phone"></i>
+            <span data-i18n="sec05Category">Contact &amp; Helpline</span>
+          </a>
+        </div>
+
+        <div class="mobile-nav-tools">
+          <button class="mobile-lang-btn" id="mobileLangToggleBtn" onclick="toggleLanguage()">
+            <i class="fa-solid fa-language"></i>
+            <span id="mobileLangLabel">ગુજરાતીમાં જુઓ (Switch to Gujarati)</span>
+          </button>
+
+          <button class="mobile-cta-btn" onclick="switchToApplyTab(); closeMobileMenu();">
+            <span data-i18n="navCta">Apply Now</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN EDITORIAL EXPERIENCE -->
+  <main class="main-wrapper">
+
+    <!-- =========================================================================
+         HERO SECTION: CINEMATIC LOOPING VIDEO & EDITORIAL STAGE
+         ========================================================================= -->
+    <section class="editorial-hero no-print" id="hero">
+      
+      <!-- CINEMATIC BACKGROUND VIDEO -->
+      <div class="hero-video-backdrop" aria-hidden="true">
+        <video
+          class="hero-video-element"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster="poster.jpg"
+        >
+          <source src="swastik.mp4" type="video/mp4">
+        </video>
+        <div class="hero-video-overlay"></div>
+      </div>
+
+      <div class="hero-backdrop-glow" aria-hidden="true"></div>
+      
+      <div class="hero-container">
+        <!-- Hero Left / Content -->
+        <div class="hero-content">
+          <div class="hero-eyebrow-row">
+            <span class="hero-tag-badge">
+              <span class="status-pulse-dot"></span>
+              <span data-i18n="heroBadgeText">Official Staff Recruitment 2026</span>
+            </span>
+            <span class="hero-location-tag">
+              <i class="fa-solid fa-location-dot"></i>
+              <span>Veraval, Gujarat</span>
+            </span>
+          </div>
+
+          <h1 class="hero-display-heading">
+            <span class="hero-headline-line" data-i18n="heroHeadLine1">Excellence in</span>
+            <span class="hero-headline-line accent-gradient" data-i18n="heroHeadLine2">Civic Operations</span>
+            <span class="hero-headline-line sub-line" data-i18n="heroHeadLine3">&amp; Public Stewardship.</span>
+          </h1>
+
+          <p class="hero-lead-text" data-i18n="heroLeadDesc">
+            Shree Swastik Enterprise oversees operations and visitor safety at Dr. Ambedkar Garden, Veraval under Veraval-Patan Joint Municipality. Join our dedicated team for official CCTV observation and park management roles.
+          </p>
+
+          <div class="hero-action-row">
+            <button class="btn-hero-primary" onclick="switchToApplyTab()">
+              <span data-i18n="heroBtnApply">Start Job Application</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="btn-hero-secondary" onclick="switchToFlyerTab()">
+              <i class="fa-solid fa-file-lines"></i>
+              <span data-i18n="heroBtnFlyer">View Official Circular</span>
+            </button>
+          </div>
+
+          <!-- Hero Micro Stats / Trust Metrics -->
+          <div class="hero-trust-strip">
+            <div class="trust-stat-item">
+              <span class="stat-number">18+</span>
+              <span class="stat-label" data-i18n="statAge">Age Eligibility</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="trust-stat-item">
+              <span class="stat-number">02</span>
+              <span class="stat-label" data-i18n="statRoles">Key Positions</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="trust-stat-item">
+              <span class="stat-number" data-i18n="statPayHighlight">Direct</span>
+              <span class="stat-label" data-i18n="statPayLabel">Timely Compensation</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Right / Visual Stage -->
+        <div class="hero-visual-stage">
+          <div class="media-frame-editorial">
+            <div class="media-glass-overlay"></div>
+            <img src="poster.jpg" alt="Dr. Ambedkar Garden, Veraval entrance and park premises" class="hero-stage-img">
+            
+            <!-- Floating Stage Chip Meta -->
+            <div class="hero-stage-chip top-chip">
+              <div class="chip-icon"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="chip-text">
+                <strong data-i18n="chipCivicTitle">Civic Partner</strong>
+                <span data-i18n="chipCivicSub">Veraval-Patan Municipality</span>
+              </div>
+            </div>
+
+            <div class="hero-stage-chip bottom-chip">
+              <div class="chip-icon pulse-icon"><i class="fa-solid fa-video"></i></div>
+              <div class="chip-text">
+                <strong data-i18n="chipActiveTitle">CCTV &amp; Security Role</strong>
+                <span data-i18n="chipActiveSub">Control Room Observation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         NARRATIVE SECTION: ABOUT CIVIC STEWARDSHIP & PARK MANAGEMENT
+         ========================================================================= -->
+    <section class="section-editorial narrative-section no-print" id="overview">
+      <div class="container">
+        <div class="editorial-grid-2col">
+          <div class="section-label-col">
+            <span class="section-num">01</span>
+            <span class="section-category" data-i18n="sec01Category">ENTERPRISE OVERVIEW</span>
+            <h2 class="section-editorial-heading" data-i18n="sec01Heading">Built on Reliability &amp; Precision.</h2>
+          </div>
+
+          <div class="section-body-col">
+            <p class="paragraph-lead" data-i18n="sec01Lead">
+              Shree Swastik Enterprise is the authorized operational body managing Dr. Ambedkar Garden in Veraval. We maintain public safety, surveillance integrity, and smooth day-to-day services for thousands of citizens and families.
+            </p>
+            <p class="paragraph-subtle" data-i18n="sec01Body">
+              Our 2026 recruitment drive invites responsible individuals to join our team in maintaining the park's surveillance room and visitor ticketing facilities. We offer competitive remuneration, a secure working environment, and transparent administrative operations.
+            </p>
+            
+            <div class="narrative-feature-list">
+              <div class="feature-line">
+                <span class="feature-bullet">01</span>
+                <div>
+                  <strong data-i18n="feat1Title">Direct Municipal Affiliation</strong>
+                  <p data-i18n="feat1Desc">Operating Dr. Ambedkar Garden under Veraval-Patan Joint Municipality guidelines.</p>
+                </div>
+              </div>
+              <div class="feature-line">
+                <span class="feature-bullet">02</span>
+                <div>
+                  <strong data-i18n="feat2Title">Fair &amp; Prompt Compensation</strong>
+                  <p data-i18n="feat2Desc">Timely salary structure based on role duties and verified work performance.</p>
+                </div>
+              </div>
+              <div class="feature-line">
+                <span class="feature-bullet">03</span>
+                <div>
+                  <strong data-i18n="feat3Title">Supportive Work Culture</strong>
+                  <p data-i18n="feat3Desc">Safe premises, clear responsibilities, and on-site guidance from supervisors.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         ROLES SHOWCASE: EDITORIAL BREAKDOWN OF AVAILABLE POSITIONS
+         ========================================================================= -->
+   
+
+
+    <!-- =========================================================================
+         TABBED INTERACTION PORTAL (APPLICATION FORM, FLYER & A4 SHEET)
+         ========================================================================= -->
+    <section class="portal-section" id="portalSection">
+      <div class="container portal-container">
+        
+        <!-- SECTION TITLE BAR -->
+        <div class="portal-top-bar no-print">
+          <div class="portal-title-block">
+            <span class="section-num">02</span>
+            <div>
+              <span class="section-category" data-i18n="sec03Category">INTERACTIVE SERVICES</span>
+              <h2 class="portal-main-heading" data-i18n="sec03Heading">Application &amp; Documentation Portal</h2>
+            </div>
+          </div>
+          <div class="portal-status-tag">
+            <span class="pulse-indicator"></span>
+            <span data-i18n="systemOnline">System Ready / Live 2026</span>
+          </div>
+        </div>
+
+        <!-- =========================================================================
+             TAB 1: STREAMLINED APPLICATION FORM
+             ========================================================================= -->
+        <div id="apply-form-tab" class="tab-content active">
+          
+          <div class="app-form-editorial-card">
+            
+            <!-- FORM HEADER -->
+            <div class="form-banner-header">
+              <div class="banner-brand-left">
+                <div class="banner-emblem">
+                  <img src="logo.png" alt="Shree Swastik Emblem">
+                </div>
+                <div>
+                  <span class="banner-sub-tag" data-i18n="companyTag">SHREE SWASTIK ENTERPRISE GROUP</span>
+                  <h3 class="banner-title" data-i18n="formTitle">Employment Application Form</h3>
+                  <p class="banner-desc" data-i18n="formNote">Dr. Ambedkar Garden, Veraval — Staff Recruitment Drive 2026</p>
+                </div>
+              </div>
+
+              <div class="banner-actions no-print">
+                <button type="button" class="btn-ghost-icon" id="btnResetForm" title="Clear Form / Reset">
+                  <i class="fa-solid fa-rotate-right"></i>
+                  <span data-i18n="btnReset">Reset Form</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- APPLICATION FORM BODY -->
+            <form id="gardenJobForm" novalidate class="editorial-form-grid">
+
+              <!-- STEP 1: ROLE SELECTION -->
+              <div class="form-block">
+                <div class="block-legend">
+                  <span class="step-circle">1</span>
+                  <div>
+                    <strong class="legend-title" data-i18n="sec1Title">Position Applied For</strong>
+                    <span class="legend-subtitle" data-i18n="sec1Sub">Choose the role you wish to apply for</span>
+                  </div>
+                </div>
+
+                <div class="role-selector-grid">
+                  
+                  <!-- ROLE OPTION: OFFICE -->
+                  <label class="role-choice-card active" id="cardRoleOffice">
+                    <input type="radio" name="jobRole" value="office" checked>
+                    <div class="role-choice-body">
+                      <div class="role-icon-box office-theme">
+                        <i class="fa-solid fa-video"></i>
+                      </div>
+                      <div class="role-text-box">
+                        <span class="role-badge-tag office-tag" data-i18n="tagOffice">Office Role (CCTV & Security)</span>
+                        <h4 class="role-card-title" data-i18n="titleOfficeRole">CCTV &amp; Security Observation</h4>
+                        <p class="role-card-sub" data-i18n="subOfficeRole">Control Room Surveillance &amp; Visitor Safety</p>
+                      </div>
+                      <div class="role-select-indicator">
+                        <i class="fa-solid fa-circle-check"></i>
+                      </div>
+                    </div>
+                  </label>
+
+                  <!-- ROLE OPTION: GENERAL -->
+                  <label class="role-choice-card" id="cardRoleGeneral">
+                    <input type="radio" name="jobRole" value="general">
+                    <div class="role-choice-body">
+                      <div class="role-icon-box general-theme">
+                        <i class="fa-solid fa-ticket"></i>
+                      </div>
+                      <div class="role-text-box">
+                        <span class="role-badge-tag general-tag" data-i18n="tagGeneral">General Role (Operations & Ticketing)</span>
+                        <h4 class="role-card-title" data-i18n="titleGeneralRole">General Role &amp; Train Ticketing</h4>
+                        <p class="role-card-sub" data-i18n="subGeneralRole">Visitor Ticketing &amp; Garden Assistance</p>
+                      </div>
+                      <div class="role-select-indicator">
+                        <i class="fa-solid fa-circle-check"></i>
+                      </div>
+                    </div>
+                  </label>
+
+                </div>
+              </div>
+
+              <!-- STEP 2: CANDIDATE INFORMATION -->
+              <div class="form-block">
+                <div class="block-legend">
+                  <span class="step-circle">2</span>
+                  <div>
+                    <strong class="legend-title" data-i18n="sec2Title">Candidate Details</strong>
+                    <span class="legend-subtitle" data-i18n="sec2Sub">Please provide accurate personal information</span>
+                  </div>
+                </div>
+
+                <div class="candidate-fields-wrapper">
+                  
+                  <!-- Left: Input fields -->
+                  <div class="candidate-inputs-grid">
+                    
+                    <!-- Full Name -->
+                    <div class="form-group span-full">
+                      <label for="fldFullName">
+                        <span data-i18n="lblFullName">Full Name (as per ID)</span>
+                        <span class="req-star">*</span>
+                      </label>
+                      <div class="input-wrap">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" id="fldFullName" name="fullName" placeholder="e.g. Solanki Nileshbhai D." required autocomplete="name">
+                      </div>
+                      <span class="validation-msg" id="msgNameError" data-i18n="valName">Please enter full legal name.</span>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="form-group span-half">
+                      <label for="fldPhone">
+                        <span data-i18n="lblPhone">Phone Number (10 Digits)</span>
+                        <span class="req-star">*</span>
+                      </label>
+                      <div class="input-wrap">
+                        <i class="fa-solid fa-phone input-icon"></i>
+                        <input type="tel" id="fldPhone" name="phone" placeholder="10-digit mobile number" maxlength="10" required autocomplete="tel">
+                      </div>
+                      <span class="validation-msg" id="msgPhoneError" data-i18n="valPhone">Enter a valid 10-digit mobile number.</span>
+                    </div>
+
+                    <!-- Email ID -->
+                    <div class="form-group span-half">
+                      <label for="fldEmail">
+                        <span data-i18n="lblEmail">Email ID</span>
+                        <span class="req-star">*</span>
+                      </label>
+                      <div class="input-wrap">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input type="email" id="fldEmail" name="email" placeholder="e.g. name@domain.com" required autocomplete="email">
+                      </div>
+                      <span class="validation-msg" id="msgEmailError" data-i18n="valEmail">Enter a valid email address.</span>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="form-group span-third">
+                      <label for="fldDob">
+                        <span data-i18n="lblDob">Date of Birth</span>
+                        <span class="req-star">*</span>
+                      </label>
+                      <div class="input-wrap">
+                        <i class="fa-solid fa-calendar-days input-icon"></i>
+                        <input type="date" id="fldDob" name="dob" required>
+                      </div>
+                      <span class="validation-msg" id="msgDobError" data-i18n="valDob">Select date of birth.</span>
+                    </div>
+
+                    <!-- Age (Auto calculated) -->
+                    <div class="form-group span-third">
+                      <label for="fldAge">
+                        <span data-i18n="lblAge">Age</span>
+                        <span class="age-req-badge">18+</span>
+                      </label>
+                      <div class="input-wrap">
+                        <i class="fa-solid fa-hourglass-half input-icon"></i>
+                        <input type="number" id="fldAge" name="age" placeholder="Years" min="18" max="75" readonly>
+                      </div>
+                      <span class="validation-msg" id="msgAgeError" data-i18n="valAge">Minimum age requirement is 18+.</span>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="form-group span-third">
+                      <label for="fldGender">
+                        <span data-i18n="lblGender">Gender</span>
+                        <span class="req-star">*</span>
+                      </label>
+                      <div class="input-wrap">
+                        <i class="fa-solid fa-venus-mars input-icon"></i>
+                        <select id="fldGender" name="gender" required>
+                          <option value="" data-i18n="optSelect">Select...</option>
+                          <option value="Male" data-i18n="optMale">Male</option>
+                          <option value="Female" data-i18n="optFemale">Female</option>
+                          <option value="Other" data-i18n="optOther">Other</option>
+                        </select>
+                      </div>
+                      <span class="validation-msg" id="msgGenderError" data-i18n="valGender">Select gender.</span>
+                    </div>
+
+                  </div>
+
+                  <!-- Right: Photo Upload Zone -->
+                  <div class="photo-upload-container">
+                    <span class="photo-box-label">
+                      <i class="fa-solid fa-camera"></i>
+                      <span data-i18n="lblPhoto">Full Face Photo (Passport Size)</span>
+                      <span class="req-star">*</span>
+                    </span>
+                    
+                    <div class="photo-dropzone" id="photoFrameBox" onclick="document.getElementById('filePhotoInput').click()">
+                      <img id="photoImgElement" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="Candidate Photo Preview">
+                      <div class="dropzone-hint">
+                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        <span data-i18n="photoPrompt">Upload Face Photo</span>
+                      </div>
+                    </div>
+                    
+                    <input type="file" id="filePhotoInput" accept="image/*" class="sr-hidden">
+                    
+                    <div class="photo-btn-row no-print">
+                      <button type="button" class="btn-photo-action" onclick="document.getElementById('filePhotoInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span data-i18n="btnUploadPhoto">Choose Image</span>
+                      </button>
+                      <button type="button" class="btn-photo-delete" id="btnRemovePhoto" style="display: none;" title="Remove Photo">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
+                    </div>
+                    <small class="photo-disclaimer" data-i18n="photoNote">Clear front-facing portrait photograph.</small>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- STEP 3: LEGAL DECLARATION -->
+              <div class="form-block declaration-block">
+                <label class="declaration-label">
+                  <input type="checkbox" id="chkDeclaration" name="declarationAccepted" required checked>
+                  <span class="custom-checkbox"></span>
+                  <span class="declaration-text" data-i18n="declarationText">
+                    I hereby declare that all information furnished above is true and authentic. I commit to fulfilling the duties assigned by Shree Swastik Enterprise Group at Dr. Ambedkar Garden, Veraval with diligence, punctuality, and utmost integrity.
+                  </span>
+                </label>
+              </div>
+
+              <!-- FORM SUBMISSION ACTIONS -->
+              <div class="form-action-bar no-print">
+                <button type="submit" class="btn-submit-primary" id="btnSubmitForm">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  <span data-i18n="btnSubmit">Submit Application</span>
+                </button>
+                <button type="button" class="btn-submit-secondary" id="btnPrintFormDirect">
+                  <i class="fa-solid fa-print"></i>
+                  <span data-i18n="btnPrintPreview">Preview &amp; Print A4 Record</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+        </div>
+
+
+        <!-- =========================================================================
+             TAB 2: OFFICIAL RECRUITMENT NOTICE / FLYER
+             ========================================================================= -->
+        <div id="flyer-view-tab" class="tab-content">
+          <div class="flyer-editorial-wrapper">
+            <div class="flyer-header-meta">
+              <div>
+                <span class="flyer-pill-tag" data-i18n="flyerTag">OFFICIAL RECRUITMENT CIRCULAR</span>
+                <h3 class="flyer-heading" data-i18n="flyerTitle">Current Recruitment Notice 2026</h3>
+                <p class="flyer-sub" data-i18n="flyerSub">Authorized notice by Shree Swastik Enterprise for Dr. Ambedkar Garden, Veraval.</p>
+              </div>
+              <div class="flyer-actions-row no-print">
+                <button type="button" class="btn-hero-primary" onclick="switchToApplyTab()">
+                  <i class="fa-solid fa-file-pen"></i>
+                  <span data-i18n="btnApplyThis">Apply for this Role</span>
+                </button>
+                <a href="current_recruitment.png" download="Shree_Swastik_Recruitment_2026.png" class="btn-hero-secondary">
+                  <i class="fa-solid fa-download"></i>
+                  <span data-i18n="btnDownloadFlyer">Download Circular</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- POSTER SHOWCASE -->
+            <div class="flyer-display-frame">
+              <img src="current_recruitment.png" alt="Shree Swastik Enterprise Official Recruitment Flyer 2026" class="flyer-image-highres">
+            </div>
+          </div>
+        </div>
+
+
+        <!-- =========================================================================
+             TAB 3: OFFICIAL A4 PRINTABLE DOCUMENT
+             ========================================================================= -->
+        <div id="a4-print-tab" class="tab-content">
+          <div class="a4-control-header no-print">
+            <div>
+              <span class="a4-badge" data-i18n="a4Badge">OFFICIAL DOCUMENT STANDARD</span>
+              <h3 class="a4-title" data-i18n="a4FormHeading">Dr. Ambedkar Garden  Employment Application Record (A4)</h3>
+              <p class="a4-sub" data-i18n="a4FormSub">Official document formatted precisely for A4 single-sheet physical filing and office records.</p>
+            </div>
+            <button class="btn-print-action" onclick="window.print()">
+              <i class="fa-solid fa-print"></i>
+              <span data-i18n="btnPrintNow">Print Physical A4 Form</span>
+            </button>
+          </div>
+
+          <!-- A4 PHYSICAL SHEET CONTAINER -->
+          <div class="a4-paper-sheet" id="printableA4Document">
+            
+            <!-- A4 HEADER -->
+            <div class="a4-doc-header">
+              <div class="a4-emblem">
+                <img src="logo.png" alt="Shree Swastik Logo">
+              </div>
+              <div class="a4-header-titles">
+                <p class="gov-text">શ્રી સ્વસ્તિક એન્ટરપ્રાઇઝ (SHREE SWASTIK ENTERPRISE GROUP)</p>
+                <h1 class="park-name-title">ડૉ. આંબેડકર પાર્ક / ગાર્ડન - વેરાવળ</h1>
+                <p class="loc-text">સ્થળ: ડૉ. આંબેડકર ગાર્ડન, વેરાવળ (જિ. ગીર સોમનાથ)</p>
+                <div class="doc-badge-chip">કર્મચારી ભરતી અરજી પત્રક (EMPLOYMENT APPLICATION FORM 2026)</div>
+              </div>
+              <div class="a4-photo-holder" id="a4PhotoContainer">
+                <span>સંપૂર્ણ ચહેરાનો ફોટો ચોંટાડવો</span>
+                <small>(Affix Full Face Photo)</small>
+              </div>
+            </div>
+
+            <!-- METADATA STRIP -->
+            <div class="a4-meta-strip">
+              <div><strong>અરજી ક્રમાંક / App No:</strong> <span class="dotted-underline" id="a4DocAppNo">AP-2026/______</span></div>
+              <div><strong>તારીખ / Date:</strong> <span class="dotted-underline" id="a4DocDate">____/____/૨૦૨૬</span></div>
+            </div>
+
+            <!-- SECTION 1: ROLE APPLIED FOR -->
+            <div class="a4-sec-heading">૧. અરજી કરેલ જગ્યા (Position Applied For)</div>
+            <div class="a4-role-selection-boxes">
+              <div class="a4-role-row-pill" id="a4RoleBoxOffice">
+                <span class="a4-checkbox-box" id="a4CheckOffice">[ ✓ ]</span>
+                <div class="a4-role-info-text">
+                  <strong>ઓફિસ રોલ (Office Role):</strong> સીસીટીવી અને સિક્યુરિટી નિરીક્ષણ (CCTV &amp; Security Observation)
+                </div>
+              </div>
+              <div class="a4-role-row-pill" id="a4RoleBoxGeneral">
+                <span class="a4-checkbox-box" id="a4CheckGeneral">[   ]</span>
+                <div class="a4-role-info-text">
+                  <strong>જનરલ રોલ (General Role):</strong> જનરલ કામગીરી અને ટ્રેન ટિકિટિંગ (Operations &amp; Ticketing)
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: CANDIDATE DETAILS TABLE -->
+            <div class="a4-sec-heading">૨. ઉમેદવારની વિગતો (Candidate Information)</div>
+            <table class="a4-table">
+              <tr>
+                <td class="col-title" style="width: 25%;">પૂરું નામ:<br><small>Full Name</small></td>
+                <td colspan="3" class="col-data" id="docFillName">____________________________________________________________________</td>
+              </tr>
+              <tr>
+                <td class="col-title">મોબાઇલ નંબર:<br><small>Phone Number</small></td>
+                <td class="col-data" style="width: 35%;" id="docFillPhone">____________________________________</td>
+                <td class="col-title" style="width: 15%;">જાતિ / Gender:</td>
+                <td class="col-data" style="width: 25%;" id="docFillGender">[ ] પુરુષ  [ ] મહિલા</td>
+              </tr>
+              <tr>
+                <td class="col-title">ઇમેઇલ આઇડી:<br><small>Email ID</small></td>
+                <td colspan="3" class="col-data" id="docFillEmail">____________________________________________________________________</td>
+              </tr>
+              <tr>
+                <td class="col-title">જન્મ તારીખ (DOB):</td>
+                <td class="col-data" id="docFillDob">____ / ____ / ________</td>
+                <td class="col-title">ઉંમર (Age):</td>
+                <td class="col-data" id="docFillAge">_______ વર્ષ (Years)</td>
+              </tr>
+            </table>
+
+            <!-- SECTION 3: DECLARATION -->
+            <div class="a4-sec-heading">૩. ઉમેદવારનું એકરારનામું (Declaration)</div>
+            <p class="a4-dec-text">
+              હું આથી ખાતરી આપું છું કે ઉપર જણાવેલ તમામ માહિતી મારી જાણ મુજબ સંપૂર્ણ સત્ય અને સાચી છે. શ્રી સ્વસ્તિક એન્ટરપ્રાઇઝ દ્વારા ડૉ. આંબેડકર પાર્ક, વેરાવળ ખાતે સોંપવામાં આવેલ કામગીરી હું સંપૂર્ણ પ્રમાણિકતા અને સમયપાલનથી કરીશ.
+            </p>
+
+            <div class="a4-sig-row">
+              <div class="sig-left">
+                <p>તારીખ: <strong>____/____/૨૦૨૬</strong></p>
+                <p>સ્થળ: <strong>વેરાવળ</strong></p>
+              </div>
+              <div class="sig-right">
+                <div class="sig-drawn-container" id="docSigContainer"></div>
+                <p><strong>ઉમેદવારની સહી (Applicant Signature)</strong></p>
+              </div>
+            </div>
+
+            <!-- TEAR OFF COUNTERFOIL SLIP -->
+            <div class="a4-tear-off-slip">
+              <div class="scissor-line">
+                <i class="fa-solid fa-scissors"></i> <span>અહીંથી કાપીને ઉમેદવારને પહોંચ આપવી (Office Acknowledgement Slip)</span>
+              </div>
+              <div class="slip-box">
+                <div class="slip-header">
+                  <strong>🏢 શ્રી સ્વસ્તિક એન્ટરપ્રાઇઝ ગ્રૂપ — ડૉ. આંબેડકર ગાર્ડન, વેરાવળ | ભરતી અરજી રસીદ</strong>
+                  <span>સંપર્ક: 8866771812 / 9099518776</span>
+                </div>
+                <div class="slip-grid">
+                  <div>અરજી નંબર: <strong><span id="rcptAppNo">AP-_______</span></strong></div>
+                  <div>ઉમેદવારનું નામ: <strong><span id="rcptName">________________________</span></strong></div>
+                  <div>અરજી કરેલ જગ્યા: <strong><span id="rcptRoleName">ઓફિસ રોલ (Office Role)</span></strong></div>
+                  <div>સ્વીકારનારની સહી: <strong>_______________</strong></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         ENTERPRISE VALUES & COMMITMENTS (EDITORIAL NUMBERED SECTION)
+         ========================================================================= -->
+    <section class="section-editorial values-section no-print" id="values">
+      <div class="container">
+        <div class="values-header">
+          <span class="section-num">04</span>
+          <span class="section-category" data-i18n="sec04Category">OPERATIONAL PILLARS</span>
+          <h2 class="section-editorial-heading" data-i18n="sec04Heading">Core Principles of Our Stewardship</h2>
+        </div>
+
+        <div class="values-triplet-grid">
+          
+          <div class="value-item-card">
+            <span class="value-num">01</span>
+            <h3 class="value-title" data-i18n="val1Title">Vigilance &amp; Visitor Safety</h3>
+            <p class="value-text" data-i18n="val1Desc">
+              Maintaining continuous observation through modern CCTV infrastructure to ensure every citizen, family, and child experiences a secure environment.
+            </p>
+          </div>
+
+          <div class="value-item-card">
+            <span class="value-num">02</span>
+            <h3 class="value-title" data-i18n="val2Title">Civic Care &amp; Punctuality</h3>
+            <p class="value-text" data-i18n="val2Desc">
+              Delivering disciplined park timings, transparent ticketing for joyful recreation, and cordial assistance to all community members.
+            </p>
+          </div>
+
+          <div class="value-item-card">
+            <span class="value-num">03</span>
+            <h3 class="value-title" data-i18n="val3Title">Professional Integrity</h3>
+            <p class="value-text" data-i18n="val3Desc">
+              Fair compensation, supportive management, and transparent recruitment standards adhering to civic authority guidelines.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         DIRECT CONTACT & HELPDESK SECTION
+         ========================================================================= -->
+    <section class="section-editorial contact-section no-print" id="contact">
+      <div class="container">
+        <div class="contact-editorial-card">
+          <div class="contact-card-content">
+            <span class="section-num">05</span>
+            <span class="section-category" data-i18n="sec05Category">ADMINISTRATIVE CONTACT</span>
+            <h2 class="contact-hero-heading" data-i18n="sec05Heading">Have Questions? Reach Out Directly.</h2>
+            <p class="contact-subtext" data-i18n="sec05Desc">
+              For recruitment inquiries, submission assistance, or office verification regarding Dr. Ambedkar Garden, Veraval, contact the enterprise administrators.
+            </p>
+
+            <div class="officer-contacts-row">
+              <a href="tel:8866771812" class="officer-card">
+                <div class="officer-icon"><i class="fa-solid fa-phone"></i></div>
+                <div class="officer-details">
+                  <span class="officer-role" data-i18n="officer1Role">Administrative Head</span>
+                  <strong class="officer-name">Nilesh D. Solanki</strong>
+                  <span class="officer-num">8866771812</span>
+                </div>
+              </a>
+
+              <a href="tel:9099518776" class="officer-card">
+                <div class="officer-icon"><i class="fa-solid fa-phone"></i></div>
+                <div class="officer-details">
+                  <span class="officer-role" data-i18n="officer2Role">Operations Coordinator</span>
+                  <strong class="officer-name">Rushi N. Solanki</strong>
+                  <span class="officer-num">9099518776</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="contact-location-bar">
+              <i class="fa-solid fa-location-dot"></i>
+              <span data-i18n="contactLocationText">Dr. Ambedkar Garden, Veraval, Dist. Gir Somnath, Gujarat</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- SUCCESS POPUP MODAL -->
+  <div class="modal-backdrop" id="successModal" role="dialog" aria-modal="true" aria-labelledby="modalSuccessHeading">
+    <div class="modal-box modal-success">
+      <div class="success-icon-badge">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 id="modalSuccessHeading" data-i18n="modalSuccessTitle">Application Submitted Successfully!</h3>
+      <p class="modal-subtext" data-i18n="modalSuccessSub">Your official Application Reference Number is:</p>
+      
+      <div class="app-ref-badge" id="modalAppId">AP-2026-001</div>
+      
+      <div class="applicant-summary-card" id="modalSummaryDetails">
+        <!-- Rendered dynamically by JS -->
+      </div>
+
+      <div class="modal-btn-row">
+        <button class="btn-submit-primary" id="modalPrintBtn">
+          <i class="fa-solid fa-print"></i>
+          <span data-i18n="btnModalPrint">Print / Save Application Form</span>
+        </button>
+        <button class="btn-submit-secondary" id="modalCloseBtn">
+          <span data-i18n="btnModalClose">Done</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- EDITORIAL MASTER FOOTER -->
+  <footer class="editorial-footer no-print">
+    <div class="container">
+      <div class="footer-top-grid">
+        <div class="footer-col-brand">
+          <div class="footer-brand-title">SHREE SWASTIK ENTERPRISE</div>
+          <p class="footer-brand-sub" data-i18n="footerMuniLine">Dr. Ambedkar Garden Operations | Veraval-Patan Joint Municipality</p>
+          <div class="footer-status-pill">
+            <i class="fa-solid fa-circle-check"></i>
+            <span data-i18n="footerAuthBadge">Authorized Civic Management Partner</span>
+          </div>
+        </div>
+
+        <div class="footer-col-nav">
+          <span class="footer-col-head" data-i18n="footerNavHead">Quick Links</span>
+          <ul class="footer-links">
+            <li><a href="#hero" data-i18n="footLinkHome">Home / Overview</a></li>
+            <li><a href="#roles" data-i18n="footLinkRoles">Available Roles</a></li>
+            <li><a href="javascript:void(0)" onclick="switchToApplyTab()" data-i18n="footLinkApply">Online Application</a></li>
+            <li><a href="javascript:void(0)" onclick="switchToFlyerTab()" data-i18n="footLinkFlyer">Recruitment Notice</a></li>
+            <li><a href="javascript:void(0)" onclick="switchToPrintTab()" data-i18n="footLinkPrint">Official A4 Form</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col-contact">
+          <span class="footer-col-head" data-i18n="footerContactHead">Helpline &amp; Support</span>
+          <p class="footer-helpline"><i class="fa-solid fa-phone"></i> <span>8866771812 / 9099518776</span></p>
+          <p class="footer-location"><i class="fa-solid fa-location-dot"></i> <span>Veraval, Gir Somnath, Gujarat</span></p>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <p class="footer-copy">&copy; 2026 Shree Swastik Enterprise Group. All rights reserved.</p>
+        <p class="footer-dev-note" data-i18n="footerLegalNote">Official recruitment for Dr. Ambedkar Garden, Veraval.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JS Logic -->
+  <script src="app.js"></script>
+  <script src="intro-fix.js"></script>
+  <script src="menu-fix.js"></script>
+</body>
+</html>
