@@ -523,6 +523,12 @@ a {
   transition: 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
+/* Switch to the hamburger menu earlier so the desktop nav never clips */
+@media (max-width: 1200px) {
+  .nav-control-hub { display: none !important; }
+  .mobile-menu-toggle { display: flex !important; }
+}
+
 /* Language Toggle Slidebar */
 .lang-slidebar {
   position: relative;

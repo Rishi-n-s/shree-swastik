@@ -11,9 +11,49 @@
 // Supabase Configuration
 const SUPABASE_URL = "https://kkzbpunwplmlxqajvxhe.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtremJwdW53cGxtbHhxYWp2eGhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4NDIyNTIsImV4cCI6MjEwNjQxODI1Mn0.Ro2EFbffFlJLibPBQd2LEzBNDQmrr6wfRSRHy4wMRiA";
-const supabase = (window.supabase && typeof window.supabase.createClient === 'function')
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+let _supabaseClient = null;
+function getSupabase() {
+  if (_supabaseClient) return _supabaseClient;
+  try {
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+      _supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+  } catch (err) {
+    console.warn('Supabase init failed:', err);
+  }
+  return _supabaseClient;
+}
+
+let isSubmitting = false;
+
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, ch => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+  ));
+}
+
+function showFormNotice(message) {
+  const box = document.getElementById('formNotice');
+  if (!box) return;
+  box.textContent = message;
+  box.hidden = false;
+}
+
+function hideFormNotice() {
+  const box = document.getElementById('formNotice');
+  if (box) { box.hidden = true; box.textContent = ''; }
+}
+
+function formatDobDisplay(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : (iso || '__/__/____');
+}
+
+function generateAppId() {
+  const stamp = Date.now().toString(36).toUpperCase().slice(-5);
+  const rand = Math.floor(Math.random() * 1296).toString(36).toUpperCase().padStart(2, '0');
+  return `AP-2026-${stamp}${rand}`;
+}
 
 
 let currentLanguage = 'en';
@@ -435,7 +475,16 @@ function initFirstVisitIntro() {
   // Video completion or error
   if (video) {
     video.addEventListener('ended', dismissIntro, { once: true });
-    video.addEventListener('error', dismissIntro, { once: true });
+    // If the video can't load/play, keep the logo splash visible briefly, then continue
+    let failTimer = null;
+    const onVideoFail = () => {
+      if (failTimer || isClosed) return;
+      video.style.display = 'none';
+      failTimer = setTimeout(dismissIntro, 3500);
+    };
+    video.addEventListener('error', onVideoFail, { once: true });
+    const introSource = video.querySelector('source');
+    if (introSource) introSource.addEventListener('error', onVideoFail, { once: true });
 
     // Autoplay muted video
     video.muted = true;
@@ -746,15 +795,13 @@ function initEventListeners() {
         p.classList.toggle('active', p.id === targetId);
       });
 
-      if (targetId === 'a4-print-tab') {
-        renderBlankA4View();
-      }
+      hideFormNotice();
     });
   });
 
   // Auto-close mobile drawer on desktop resize
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 1024) {
+    if (window.innerWidth > 1200) {
       window.closeMobileMenu();
     }
   });
@@ -785,6 +832,25 @@ function initEventListeners() {
     }
   });
 
+  // DOB cannot be in the future
+  if (dobInput) {
+    const t = new Date();
+    dobInput.max = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+  }
+
+  // Phone: digits only
+  const phoneInput = document.getElementById('fldPhone');
+  if (phoneInput) {
+    phoneInput.addEventListener('input', () => {
+      const digits = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+      if (digits !== phoneInput.value) phoneInput.value = digits;
+    });
+  }
+
+  // Declaration: clear notice once ticked
+  const declBox = document.getElementById('chkDeclaration');
+  if (declBox) declBox.addEventListener('change', () => { if (declBox.checked) hideFormNotice(); });
+
   // Photo Upload Handler
   const photoInput = document.getElementById('filePhotoInput');
   if (photoInput) photoInput.addEventListener('change', handlePhotoFile);
@@ -794,7 +860,7 @@ function initEventListeners() {
 
   // Reset Button
   const resetBtn = document.getElementById('btnResetForm');
-  if (resetBtn) resetBtn.addEventListener('click', resetForm);
+  if (resetBtn) resetBtn.addEventListener('click', () => { resetForm(); renderBlankA4View(); });
 
   // Role Selection Cards inside Form
   document.querySelectorAll('.role-choice-card').forEach(card => {
@@ -824,6 +890,17 @@ function initEventListeners() {
       document.getElementById('successModal').classList.remove('active');
     });
   }
+
+  // Modal: Escape key and backdrop click close it
+  const successModal = document.getElementById('successModal');
+  if (successModal) {
+    successModal.addEventListener('click', (e) => {
+      if (e.target === successModal) successModal.classList.remove('active');
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && successModal) successModal.classList.remove('active');
+  });
 
   const modalPrintBtn = document.getElementById('modalPrintBtn');
   if (modalPrintBtn) {
@@ -882,9 +959,17 @@ function handlePhotoFile(e) {
   if (!file) return;
 
   if (file.size > 5 * 1024 * 1024) {
-    alert(currentLanguage === 'gu' ? "કૃપા કરીને 5MB કરતાં નાની સાઈઝનો ફોટો પસંદ કરો." : "Please select an image smaller than 5MB.");
+    showFormNotice(currentLanguage === 'gu' ? "કૃપા કરીને 5MB કરતાં નાની સાઈઝનો ફોટો પસંદ કરો." : "Please select an image smaller than 5MB.");
+    e.target.value = '';
     return;
   }
+
+  if (!/^image\//.test(file.type)) {
+    showFormNotice(currentLanguage === 'gu' ? "કૃપા કરીને ફક્ત ફોટો (ઇમેજ) ફાઇલ પસંદ કરો." : "Please choose an image file.");
+    e.target.value = '';
+    return;
+  }
+  hideFormNotice();
 
   const reader = new FileReader();
   reader.onload = (event) => {
@@ -922,10 +1007,15 @@ function resetForm() {
   if (fldAge) fldAge.value = '';
   document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
   document.querySelectorAll('.validation-msg').forEach(el => el.classList.remove('visible'));
+  document.querySelectorAll('.role-choice-card').forEach(c => c.classList.remove('active'));
+  const defaultCard = document.getElementById('cardRoleOffice');
+  if (defaultCard) defaultCard.classList.add('active');
+  hideFormNotice();
 }
 
 // Helper: Upload photo to Supabase Storage with strict 4s timeout
 async function uploadPhotoToSupabase(base64Data, filename) {
+  const supabase = getSupabase();
   if (!supabase || !base64Data) return null;
   try {
     const uploadTask = (async () => {
@@ -965,6 +1055,8 @@ async function handleFormSubmit(e) {
   if (e && typeof e.preventDefault === 'function') {
     e.preventDefault();
   }
+  if (isSubmitting) return;
+  hideFormNotice();
 
   // Pre-calculate age if DOB entered
   computeAge();
@@ -997,9 +1089,9 @@ async function handleFormSubmit(e) {
     document.getElementById('msgNameError')?.classList.remove('visible');
   }
 
-  // Phone check (at least 10 digits)
+  // Phone check (valid Indian mobile: 10 digits starting 6-9)
   const cleanPhone = phone.replace(/\D/g, '');
-  if (!cleanPhone || cleanPhone.length < 10) {
+  if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
     phoneEl.classList.add('invalid');
     document.getElementById('msgPhoneError')?.classList.add('visible');
     valid = false;
@@ -1054,15 +1146,24 @@ async function handleFormSubmit(e) {
     document.getElementById('msgGenderError')?.classList.remove('visible');
   }
 
-  // If validation fails, scroll to first error field and alert
+  // Declaration must be explicitly accepted
+  const declEl = document.getElementById('chkDeclaration');
+  let declarationMissing = false;
+  if (declEl && !declEl.checked) {
+    declarationMissing = true;
+    valid = false;
+    if (!firstInvalidEl) firstInvalidEl = declEl;
+  }
+
+  // If validation fails, scroll to first error field and show inline notice
   if (!valid) {
     if (firstInvalidEl) {
       firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(() => firstInvalidEl.focus(), 300);
+      setTimeout(() => firstInvalidEl.focus({ preventScroll: true }), 300);
     }
-    alert(currentLanguage === 'gu'
-      ? "કૃપા કરીને લાલ રંગથી દર્શાવેલી તમામ વિગતો યોગ્ય રીતે ભરો."
-      : "Please fill all required highlighted fields properly.");
+    showFormNotice(declarationMissing && firstInvalidEl === declEl
+      ? (currentLanguage === 'gu' ? "કૃપા કરીને સબમિટ કરતા પહેલાં એકરારનામાને સ્વીકારો." : "Please confirm the declaration before submitting.")
+      : (currentLanguage === 'gu' ? "કૃપા કરીને લાલ રંગથી દર્શાવેલી તમામ વિગતો યોગ્ય રીતે ભરો." : "Please fill all required highlighted fields properly."));
     return;
   }
 
@@ -1074,7 +1175,8 @@ async function handleFormSubmit(e) {
     submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>${currentLanguage === 'gu' ? 'અરજી જમા થઈ રહી છે...' : 'Submitting...'}</span>`;
   }
 
-  const appId = `AP-2026-${Math.floor(100 + Math.random() * 900)}`;
+  isSubmitting = true;
+  const appId = generateAppId();
   const today = new Date();
   const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
@@ -1088,6 +1190,9 @@ async function handleFormSubmit(e) {
   const roleShort = roleValue === 'office'
     ? 'ઓફિસ રોલ (Office Role)'
     : 'જનરલ રોલ (General Role)';
+
+  let savedOnline = false;
+  const supabase = getSupabase();
 
   try {
     // 1. Upload photo to Supabase storage if photo attached
@@ -1121,6 +1226,7 @@ async function handleFormSubmit(e) {
         if (error) {
           console.warn('Supabase DB Notice:', error.message);
         } else {
+          savedOnline = true;
           console.log('Application saved to Supabase! Reference:', appId);
         }
       } catch (dbErr) {
@@ -1130,6 +1236,7 @@ async function handleFormSubmit(e) {
   } catch (err) {
     console.warn('Submission processing notice:', err);
   } finally {
+    isSubmitting = false;
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalBtnHtml;
@@ -1149,7 +1256,8 @@ async function handleFormSubmit(e) {
     age: age,
     gender: gender,
     photo: uploadedPhotoBase64,
-    appliedDate: formattedDate
+    appliedDate: formattedDate,
+    savedOnline: savedOnline
   };
 
   // Celebration confetti
@@ -1160,21 +1268,29 @@ async function handleFormSubmit(e) {
   // Populate A4 sheet and open success modal
   populateA4Sheet(cand);
   showSuccessModal(cand);
-  resetForm();
+  resetForm();   // clears the form only; the filled A4 record stays available for printing
 }
 
 
 
 function showSuccessModal(cand) {
   document.getElementById('modalAppId').textContent = cand.id;
+  const statusLine = cand.savedOnline
+    ? ''
+    : `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;border:1px solid rgba(245,158,11,.5);background:rgba(245,158,11,.12);color:#fcd34d;font-weight:600">${
+        currentLanguage === 'gu'
+          ? 'ચેતવણી: તમારી અરજી ઓનલાઇન સેવ થઈ શકી નથી. કૃપા કરીને A4 ફોર્મ પ્રિન્ટ કરી ઓફિસમાં જમા કરાવો અથવા 8866771812 / 9099518776 પર સંપર્ક કરો.'
+          : 'Notice: your application could not be saved online. Please print the A4 form and submit it at the office, or call 8866771812 / 9099518776.'}</div>`;
+  const e = escapeHtml;
   document.getElementById('modalSummaryDetails').innerHTML = `
     <div><strong>${currentLanguage === 'gu' ? 'સંસ્થા:' : 'Enterprise:'}</strong> Shree Swastik Enterprise (ડૉ. આંબેડકર ગાર્ડન)</div>
-    <div><strong>${currentLanguage === 'gu' ? 'ઉમેદવારનું નામ:' : 'Candidate:'}</strong> ${cand.fullName}</div>
-    <div><strong>${currentLanguage === 'gu' ? 'પસંદ કરેલ રોલ:' : 'Applied Role:'}</strong> ${cand.jobRole}</div>
-    <div><strong>${currentLanguage === 'gu' ? 'સંપર્ક નંબર:' : 'Phone:'}</strong> ${cand.phone}</div>
-    <div><strong>${currentLanguage === 'gu' ? 'ઇમેઇલ:' : 'Email:'}</strong> ${cand.email}</div>
-    <div><strong>${currentLanguage === 'gu' ? 'ઉંમર / જાતિ:' : 'Age / Gender:'}</strong> ${cand.age} Yrs | ${cand.gender}</div>
-    <div><strong>${currentLanguage === 'gu' ? 'અરજી તારીખ:' : 'Date:'}</strong> ${cand.appliedDate}</div>
+    <div><strong>${currentLanguage === 'gu' ? 'ઉમેદવારનું નામ:' : 'Candidate:'}</strong> ${e(cand.fullName)}</div>
+    <div><strong>${currentLanguage === 'gu' ? 'પસંદ કરેલ રોલ:' : 'Applied Role:'}</strong> ${e(cand.jobRole)}</div>
+    <div><strong>${currentLanguage === 'gu' ? 'સંપર્ક નંબર:' : 'Phone:'}</strong> ${e(cand.phone)}</div>
+    <div><strong>${currentLanguage === 'gu' ? 'ઇમેઇલ:' : 'Email:'}</strong> ${e(cand.email)}</div>
+    <div><strong>${currentLanguage === 'gu' ? 'ઉંમર / જાતિ:' : 'Age / Gender:'}</strong> ${e(cand.age)} Yrs | ${e(cand.gender)}</div>
+    <div><strong>${currentLanguage === 'gu' ? 'અરજી તારીખ:' : 'Date:'}</strong> ${e(cand.appliedDate)}</div>
+    ${statusLine}
   `;
   document.getElementById('successModal').classList.add('active');
 }
@@ -1189,7 +1305,7 @@ function populateA4Sheet(cand) {
   document.getElementById('a4DocDate').textContent = cand.appliedDate || '01/10/2026';
   document.getElementById('docFillName').textContent = cand.fullName;
   document.getElementById('docFillGender').textContent = cand.gender || 'પુરુષ (Male)';
-  document.getElementById('docFillDob').textContent = cand.dob || '__/__/____';
+  document.getElementById('docFillDob').textContent = formatDobDisplay(cand.dob);
   document.getElementById('docFillAge').textContent = `${cand.age} વર્ષ (Years)`;
   document.getElementById('docFillPhone').textContent = cand.phone;
   document.getElementById('docFillEmail').textContent = cand.email || '-';
@@ -1198,14 +1314,19 @@ function populateA4Sheet(cand) {
   const roleVal = cand.jobRoleValue || 'office';
   const checkOffice = document.getElementById('a4CheckOffice');
   const checkGeneral = document.getElementById('a4CheckGeneral');
-  if (checkOffice) checkOffice.textContent = roleVal === 'office' ? '[ ✓ ]' : '[   ]';
-  if (checkGeneral) checkGeneral.textContent = roleVal === 'general' ? '[ ✓ ]' : '[   ]';
+  if (checkOffice) checkOffice.textContent = roleVal === 'office' ? '[ X ]' : '[   ]';
+  if (checkGeneral) checkGeneral.textContent = roleVal === 'general' ? '[ X ]' : '[   ]';
 
   // Photo
   const photoBox = document.getElementById('a4PhotoContainer');
   if (photoBox) {
     if (cand.photo) {
-      photoBox.innerHTML = `<img src="${cand.photo}" style="width:100%; height:100%; object-fit:cover;" alt="Candidate Photo">`;
+      photoBox.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = cand.photo;
+      img.alt = 'Candidate Photo';
+      img.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+      photoBox.appendChild(img);
     } else {
       photoBox.innerHTML = `<span>સંપૂર્ણ ચહેરાનો ફોટો ચોંટાડવો</span><small>(Affix Full Face Photo)</small>`;
     }
@@ -1236,25 +1357,42 @@ function renderBlankA4View() {
   
   document.getElementById('rcptAppNo').textContent = 'AP-_______';
   document.getElementById('rcptName').textContent = '________________________';
+  const co = document.getElementById('a4CheckOffice');
+  const cg = document.getElementById('a4CheckGeneral');
+  if (co) co.textContent = '[   ]';
+  if (cg) cg.textContent = '[   ]';
+  const rr = document.getElementById('rcptRoleName');
+  if (rr) rr.textContent = '________________________';
+  updateDateDisplays();
 }
 
 function printFormDirectly() {
   const name = document.getElementById('fldFullName').value.trim();
   if (!name) {
-    alert(currentLanguage === 'gu'
+    const nameEl = document.getElementById('fldFullName');
+    nameEl.classList.add('invalid');
+    document.getElementById('msgNameError')?.classList.add('visible');
+    nameEl.focus();
+    showFormNotice(currentLanguage === 'gu'
       ? "કૃપા કરીને પહેલાં અરજી ફોર્મમાં તમારી વિગતો ભરો."
       : "Please fill out the form details first.");
     return;
   }
+  hideFormNotice();
+
+  const roleChecked = document.querySelector('input[name="jobRole"]:checked');
+  const previewRole = roleChecked ? roleChecked.value : 'office';
 
   const cand = {
     id: "AP-2026-PREVIEW",
+    jobRoleValue: previewRole,
+    jobRoleShort: previewRole === 'office' ? 'ઓફિસ રોલ (Office Role)' : 'જનરલ રોલ (General Role)',
     fullName: name,
     phone: document.getElementById('fldPhone').value || '__________',
     email: document.getElementById('fldEmail').value || '__________',
     dob: document.getElementById('fldDob').value || '____-__-__',
     age: document.getElementById('fldAge').value || '__',
-    gender: document.getElementById('fldGender').value || 'પુરુષ (Male)',
+    gender: document.getElementById('fldGender').value || '________',
     photo: uploadedPhotoBase64,
     appliedDate: document.getElementById('a4DocDate').textContent
   };

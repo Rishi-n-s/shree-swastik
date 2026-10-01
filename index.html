@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shree Swastik Enterprise  Dr. Ambedkar Garden Veraval | Staff Recruitment 2026</title>
+  <title>Shree Swastik Enterprise | Dr. Ambedkar Garden Veraval | Staff Recruitment 2026</title>
   <meta name="description" content="Shree Swastik Enterprise Group. Official staff recruitment & civic management for Dr. Ambedkar Garden, Veraval. Office Role (CCTV & Security) and General Role (Operations & Ticketing).">
 
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Google Fonts: Outfit (Display), Inter (Body), Noto Sans Gujarati -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Canvas Confetti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="styles.css">
@@ -47,7 +47,7 @@
       <h2 class="site-intro__title">Shree Swastik Enterprise</h2>
       <p class="site-intro__sub">Dr. Ambedkar Garden, Veraval</p>
     </div>
-    <button class="site-intro__skip" id="siteIntroSkip" type="button" aria-label="Skip intro and enter portal" onclick="document.body.classList.remove('intro-playing');document.documentElement.classList.add('intro-seen');document.getElementById('siteIntro')?.remove()">
+    <button class="site-intro__skip" id="siteIntroSkip" type="button" aria-label="Skip intro and enter portal">
       <span>Enter Portal</span>
       <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
     </button>
@@ -59,7 +59,7 @@
 
   <!-- FLOATING QUICK ACTIONS DOCK (Desktop) -->
   <aside class="floating-quick-dock no-print" aria-label="Quick Actions">
-    <button class="dock-btn dock-lang" id="langToggleBtn" title="Switch Language / ભાષા બદલો" aria-label="Toggle language">
+    <button type="button" class="dock-btn dock-lang" id="langToggleBtn" title="Switch Language / ભાષા બદલો" aria-label="Toggle language">
       <i class="fa-solid fa-globe"></i>
       <span id="currentLangLabel">ગુજરાતી</span>
     </button>
@@ -112,19 +112,19 @@
             <!-- Animated SVG Laser Outline -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 540 48"
-              height="48"
-              width="540"
+              viewBox="0 0 500 44"
+              height="44"
+              width="500"
               overflow="visible"
               class="uiverse-outline"
             >
               <rect
                 stroke-width="3"
-                rx="24"
-                ry="24"
+                rx="22"
+                ry="22"
                 fill="transparent"
-                height="48"
-                width="540"
+                height="44"
+                width="500"
                 y="0"
                 x="0"
                 pathLength="100"
@@ -187,7 +187,7 @@
         </div>
 
         <div class="mobile-nav-tools">
-          <button class="mobile-lang-btn" id="mobileLangToggleBtn" onclick="toggleLanguage()">
+          <button class="mobile-lang-btn" id="mobileLangToggleBtn" type="button">
             <i class="fa-solid fa-language"></i>
             <span id="mobileLangLabel">ગુજરાતીમાં જુઓ (Switch to Gujarati)</span>
           </button>
@@ -503,7 +503,7 @@
                       </label>
                       <div class="input-wrap">
                         <i class="fa-solid fa-phone input-icon"></i>
-                        <input type="tel" id="fldPhone" name="phone" placeholder="10-digit mobile number" maxlength="10" required autocomplete="tel">
+                        <input type="tel" id="fldPhone" name="phone" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" pattern="[6-9][0-9]{9}" required autocomplete="tel">
                       </div>
                       <span class="validation-msg" id="msgPhoneError" data-i18n="valPhone">Enter a valid 10-digit mobile number.</span>
                     </div>
@@ -603,13 +603,15 @@
               <!-- STEP 3: LEGAL DECLARATION -->
               <div class="form-block declaration-block">
                 <label class="declaration-label">
-                  <input type="checkbox" id="chkDeclaration" name="declarationAccepted" required checked>
+                  <input type="checkbox" id="chkDeclaration" name="declarationAccepted" required>
                   <span class="custom-checkbox"></span>
                   <span class="declaration-text" data-i18n="declarationText">
                     I hereby declare that all information furnished above is true and authentic. I commit to fulfilling the duties assigned by Shree Swastik Enterprise Group at Dr. Ambedkar Garden, Veraval with diligence, punctuality, and utmost integrity.
                   </span>
                 </label>
               </div>
+
+              <p id="formNotice" class="form-notice" role="alert" aria-live="assertive" hidden></p>
 
               <!-- FORM SUBMISSION ACTIONS -->
               <div class="form-action-bar no-print">
@@ -667,7 +669,7 @@
           <div class="a4-control-header no-print">
             <div>
               <span class="a4-badge" data-i18n="a4Badge">OFFICIAL DOCUMENT STANDARD</span>
-              <h3 class="a4-title" data-i18n="a4FormHeading">Dr. Ambedkar Garden  Employment Application Record (A4)</h3>
+              <h3 class="a4-title" data-i18n="a4FormHeading">Dr. Ambedkar Garden — Employment Application Record (A4)</h3>
               <p class="a4-sub" data-i18n="a4FormSub">Official document formatted precisely for A4 single-sheet physical filing and office records.</p>
             </div>
             <button class="btn-print-action" onclick="window.print()">
@@ -706,7 +708,7 @@
             <div class="a4-sec-heading">૧. અરજી કરેલ જગ્યા (Position Applied For)</div>
             <div class="a4-role-selection-boxes">
               <div class="a4-role-row-pill" id="a4RoleBoxOffice">
-                <span class="a4-checkbox-box" id="a4CheckOffice">[ ✓ ]</span>
+                <span class="a4-checkbox-box" id="a4CheckOffice">[ X ]</span>
                 <div class="a4-role-info-text">
                   <strong>ઓફિસ રોલ (Office Role):</strong> સીસીટીવી અને સિક્યુરિટી નિરીક્ષણ (CCTV &amp; Security Observation)
                 </div>
@@ -768,7 +770,7 @@
               </div>
               <div class="slip-box">
                 <div class="slip-header">
-                  <strong>🏢 શ્રી સ્વસ્તિક એન્ટરપ્રાઇઝ ગ્રૂપ — ડૉ. આંબેડકર ગાર્ડન, વેરાવળ | ભરતી અરજી રસીદ</strong>
+                  <strong>શ્રી સ્વસ્તિક એન્ટરપ્રાઇઝ ગ્રૂપ — ડૉ. આંબેડકર ગાર્ડન, વેરાવળ | ભરતી અરજી રસીદ</strong>
                   <span>સંપર્ક: 8866771812 / 9099518776</span>
                 </div>
                 <div class="slip-grid">
@@ -943,7 +945,5 @@
 
   <!-- Main JS Logic -->
   <script src="app.js"></script>
-  <script src="intro-fix.js"></script>
-  <script src="menu-fix.js"></script>
 </body>
 </html>
