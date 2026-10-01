@@ -2823,3 +2823,5 @@ a {
     display: none;
   }
 }
+
+.skip-link{position:fixed;z-index:3000;top:12px;left:12px;transform:translateY(-180%);padding:10px 14px;border-radius:8px;background:var(--brand-gold);color:#17120a;font-weight:800}.skip-link:focus{transform:translateY(0)}:focus-visible{outline:3px solid var(--brand-gold);outline-offset:3px}.form-notice{margin:18px 0 0;padding:12px 14px;border:1px solid rgba(248,113,113,.5);border-radius:8px;background:rgba(127,29,29,.22);color:#fecaca;font-size:.9rem;font-weight:600}[hidden]{display:none!important}@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}

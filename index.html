@@ -32,8 +32,10 @@
       }
     } catch (e) {}
   </script>
+  <script src="site-fix.js" defer></script>
 </head>
 <body class="theme-dark">
+  <a class="skip-link" href="#main-content">Skip to application content</a>
   <!-- FIRST-VISIT CINEMATIC INTRO -->
   <section class="site-intro" id="siteIntro" aria-label="Welcome to Shree Swastik Enterprise">
     <video class="site-intro__video" id="siteIntroVideo" autoplay muted playsinline preload="auto" poster="poster.jpg">
@@ -201,7 +203,7 @@
   </header>
 
   <!-- MAIN EDITORIAL EXPERIENCE -->
-  <main class="main-wrapper">
+  <main class="main-wrapper" id="main-content" tabindex="-1">
 
     <!-- =========================================================================
          HERO SECTION: CINEMATIC LOOPING VIDEO & EDITORIAL STAGE
@@ -919,7 +921,7 @@
           <span class="footer-col-head" data-i18n="footerNavHead">Quick Links</span>
           <ul class="footer-links">
             <li><a href="#hero" data-i18n="footLinkHome">Home / Overview</a></li>
-            <li><a href="#roles" data-i18n="footLinkRoles">Available Roles</a></li>
+            <li><a href="#portalSection" data-i18n="footLinkRoles">Available Roles</a></li>
             <li><a href="javascript:void(0)" onclick="switchToApplyTab()" data-i18n="footLinkApply">Online Application</a></li>
             <li><a href="javascript:void(0)" onclick="switchToFlyerTab()" data-i18n="footLinkFlyer">Recruitment Notice</a></li>
             <li><a href="javascript:void(0)" onclick="switchToPrintTab()" data-i18n="footLinkPrint">Official A4 Form</a></li>
