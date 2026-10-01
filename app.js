@@ -969,24 +969,24 @@ async function handleFormSubmit(e) {
   // Pre-calculate age if DOB entered
   computeAge();
 
-  const nameEl   = document.getElementById('fldFullName');
-  const phoneEl  = document.getElementById('fldPhone');
-  const emailEl  = document.getElementById('fldEmail');
-  const dobEl    = document.getElementById('fldDob');
-  const ageEl    = document.getElementById('fldAge');
+  const nameEl = document.getElementById('fldFullName');
+  const phoneEl = document.getElementById('fldPhone');
+  const emailEl = document.getElementById('fldEmail');
+  const dobEl = document.getElementById('fldDob');
+  const ageEl = document.getElementById('fldAge');
   const genderEl = document.getElementById('fldGender');
 
-  const name   = nameEl   ? nameEl.value.trim()        : '';
-  const phone  = phoneEl  ? phoneEl.value.trim()        : '';
-  const email  = emailEl  ? emailEl.value.trim()        : '';
-  const dob    = dobEl    ? dobEl.value                 : '';
-  const age    = ageEl    ? (parseInt(ageEl.value) || 0): 0;
-  const gender = genderEl ? genderEl.value              : '';
+  const name = nameEl ? nameEl.value.trim() : '';
+  const phone = phoneEl ? phoneEl.value.trim() : '';
+  const email = emailEl ? emailEl.value.trim() : '';
+  const dob = dobEl ? dobEl.value : '';
+  const age = ageEl ? (parseInt(ageEl.value) || 0) : 0;
+  const gender = genderEl ? genderEl.value : '';
 
-  // ── Validation ────────────────────────────────────────────────
   let valid = true;
   let firstInvalidEl = null;
 
+  // Name check
   if (!name) {
     nameEl.classList.add('invalid');
     document.getElementById('msgNameError')?.classList.add('visible');
@@ -997,6 +997,7 @@ async function handleFormSubmit(e) {
     document.getElementById('msgNameError')?.classList.remove('visible');
   }
 
+  // Phone check (at least 10 digits)
   const cleanPhone = phone.replace(/\D/g, '');
   if (!cleanPhone || cleanPhone.length < 10) {
     phoneEl.classList.add('invalid');
@@ -1008,6 +1009,7 @@ async function handleFormSubmit(e) {
     document.getElementById('msgPhoneError')?.classList.remove('visible');
   }
 
+  // Email check
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!email || !emailRegex.test(email)) {
     emailEl.classList.add('invalid');
@@ -1019,6 +1021,7 @@ async function handleFormSubmit(e) {
     document.getElementById('msgEmailError')?.classList.remove('visible');
   }
 
+  // DOB check
   if (!dob) {
     dobEl.classList.add('invalid');
     document.getElementById('msgDobError')?.classList.add('visible');
@@ -1029,6 +1032,7 @@ async function handleFormSubmit(e) {
     document.getElementById('msgDobError')?.classList.remove('visible');
   }
 
+  // Age check (18+)
   if (age < 18) {
     ageEl.classList.add('invalid');
     document.getElementById('msgAgeError')?.classList.add('visible');
@@ -1039,6 +1043,7 @@ async function handleFormSubmit(e) {
     document.getElementById('msgAgeError')?.classList.remove('visible');
   }
 
+  // Gender check
   if (!gender) {
     genderEl.classList.add('invalid');
     document.getElementById('msgGenderError')?.classList.add('visible');
@@ -1049,18 +1054,19 @@ async function handleFormSubmit(e) {
     document.getElementById('msgGenderError')?.classList.remove('visible');
   }
 
+  // If validation fails, scroll to first error field and alert
   if (!valid) {
     if (firstInvalidEl) {
       firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => firstInvalidEl.focus(), 300);
     }
     alert(currentLanguage === 'gu'
-      ? 'કૃપા કરીને લાલ રંગથી દર્શાવેલી તમામ વિગતો યોગ્ય રીતે ભરો.'
-      : 'Please fill all required highlighted fields properly.');
+      ? "કૃપા કરીને લાલ રંગથી દર્શાવેલી તમામ વિગતો યોગ્ય રીતે ભરો."
+      : "Please fill all required highlighted fields properly.");
     return;
   }
 
-  // ── Submit button → loading state ────────────────────────────
+  // Submit button visual feedback
   const submitBtn = document.getElementById('btnSubmitForm');
   const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
   if (submitBtn) {
@@ -1068,81 +1074,90 @@ async function handleFormSubmit(e) {
     submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>${currentLanguage === 'gu' ? 'અરજી જમા થઈ રહી છે...' : 'Submitting...'}</span>`;
   }
 
-  // ── Build base data ───────────────────────────────────────────
-  const appId         = `AP-2026-${Math.floor(100 + Math.random() * 900)}`;
-  const today         = new Date();
-  const formattedDate = `${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+  const appId = `AP-2026-${Math.floor(100 + Math.random() * 900)}`;
+  const today = new Date();
+  const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-  const selectedRoleEl = document.querySelector('input[name="jobRole"]:checked');
-  const roleValue      = selectedRoleEl ? selectedRoleEl.value : 'office';
+  const selectedRoleVal = document.querySelector('input[name="jobRole"]:checked');
+  const roleValue = selectedRoleVal ? selectedRoleVal.value : 'office';
 
   const roleName = roleValue === 'office'
     ? (currentLanguage === 'gu' ? 'ઓફિસ રોલ: સીસીટીવી અને સિક્યુરિટી નિરીક્ષણ' : 'Office Role: CCTV & Security Observation')
-    : (currentLanguage === 'gu' ? 'જનરલ રોલ: ટિકિટિંગ અને ગાર્ડન વ્યવસ્થા'      : 'General Role: Ticketing & Operations');
+    : (currentLanguage === 'gu' ? 'જનરલ રોલ: ટિકિટિંગ અને ગાર્ડન વ્યવસ્થા' : 'General Role: Ticketing & Operations');
 
   const roleShort = roleValue === 'office'
     ? 'ઓફિસ રોલ (Office Role)'
     : 'જનરલ રોલ (General Role)';
 
-  // ── Supabase: photo upload + DB insert ───────────────────────
-  let remotePhotoUrl = null;
   try {
+    // 1. Upload photo to Supabase storage if photo attached
+    let remotePhotoUrl = null;
     if (uploadedPhotoBase64 && supabase) {
       remotePhotoUrl = await uploadPhotoToSupabase(uploadedPhotoBase64, appId);
     }
 
+    // 2. Insert into Supabase database (with 5-second timeout)
     if (supabase) {
-      const insertPromise = supabase.from('applications').insert([{
-        app_number : appId,
-        full_name  : name,
-        phone      : phone,
-        email      : email,
-        dob        : dob,
-        age        : age,
-        gender     : gender,
-        job_role   : roleValue,
-        photo_url  : remotePhotoUrl || null
-      }]);
-      const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('DB Timeout')), 5000)
-      );
-      const { error } = await Promise.race([insertPromise, timeout]);
-      if (error) {
-        console.warn('Supabase DB Notice:', error.message);
-      } else {
-        console.log('Application saved to Supabase! Reference:', appId);
+      try {
+        const insertPromise = supabase.from('applications').insert([
+          {
+            app_number: appId,
+            full_name: name,
+            phone: phone,
+            email: email,
+            dob: dob,
+            age: age,
+            gender: gender,
+            job_role: roleValue,
+            photo_url: remotePhotoUrl || null
+          }
+        ]);
+
+        const timeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('DB Timeout')), 5000)
+        );
+
+        const { data, error } = await Promise.race([insertPromise, timeout]);
+        if (error) {
+          console.warn('Supabase DB Notice:', error.message);
+        } else {
+          console.log('Application saved to Supabase! Reference:', appId);
+        }
+      } catch (dbErr) {
+        console.warn('Supabase DB Exception:', dbErr.message || dbErr);
       }
     }
   } catch (err) {
     console.warn('Submission processing notice:', err);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnHtml;
+    }
   }
 
-  // ── Restore submit button ─────────────────────────────────────
-  if (submitBtn) {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = originalBtnHtml;
-  }
-
-  // ── Build candidate record (after await, all vars in scope) ──
+  // Construct candidate record
   const cand = {
-    id            : appId,
-    jobRole       : roleName,
-    jobRoleShort  : roleShort,
-    jobRoleValue  : roleValue,
-    fullName      : name,
-    phone         : phone,
-    email         : email,
-    dob           : dob,
-    age           : age,
-    gender        : gender,
-    photo         : remotePhotoUrl || uploadedPhotoBase64,
-    appliedDate   : formattedDate
+    id: appId,
+    jobRole: roleName,
+    jobRoleShort: roleShort,
+    jobRoleValue: roleValue,
+    fullName: name,
+    phone: phone,
+    email: email,
+    dob: dob,
+    age: age,
+    gender: gender,
+    photo: uploadedPhotoBase64,
+    appliedDate: formattedDate
   };
 
-  // ── Celebrate, populate A4, show modal ───────────────────────
+  // Celebration confetti
   if (typeof confetti === 'function') {
     confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
   }
+
+  // Populate A4 sheet and open success modal
   populateA4Sheet(cand);
   showSuccessModal(cand);
   resetForm();
